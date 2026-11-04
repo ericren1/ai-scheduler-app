@@ -1,0 +1,50 @@
+.planner { min-width: 0; }
+.planner h1 { margin: 0; font-size: 1.7rem; }
+.planner h2 { font-size: 1rem; }
+.planner button, .planner select { font: inherit; border: 1px solid #cbd5e1; border-radius: 6px; padding: 7px 10px; background: white; color: #0f172a; }
+.planner :focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+.planner-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.planner-toolbar p { margin: 8px 0; }
+.planner-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.planner-controls label { display: flex; align-items: center; gap: 5px; }
+.calendar-muted { color: #475569; font-size: 0.85rem; }
+.planner-workspace { display: flex; align-items: flex-start; gap: 16px; }
+.unscheduled-panel { flex: 0 0 220px; background: white; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px; }
+.unscheduled-panel h2 { margin-top: 0; }
+.unscheduled-panel ul { padding: 0; list-style: none; }
+.unscheduled-panel li { padding: 12px 0; border-top: 1px solid #e2e8f0; overflow-wrap: anywhere; }
+.calendar-scroll { flex: 1; min-width: 0; max-height: 75vh; overflow: auto; border: 1px solid #cbd5e1; border-radius: 8px; background: white; }
+.calendar-sheet { min-width: 1120px; }
+.calendar-seven-columns { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.calendar-day-headers { position: sticky; top: 0; z-index: 3; background: #f1f5f9; border-bottom: 1px solid #cbd5e1; }
+.calendar-day-headers > div { padding: 14px 10px; border-right: 1px solid #e2e8f0; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+.calendar-day-headers span { font-size: 0.7rem; }
+.calendar-today { background: #dbeafe; color: #1e40af; }
+.calendar-row-label { margin: 0; padding: 6px 10px; background: #f8fafc; font-size: 0.75rem !important; color: #475569; }
+.calendar-date-row > div { padding: 8px; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; min-height: 42px; }
+.date-row-card { border-inline-start: 4px solid; background: #f1f5f9; border-radius: 4px; padding: 6px; margin-bottom: 4px; overflow-wrap: anywhere; font-size: 0.8rem; }
+.outside-hours > div { font-size: 0.75rem; padding: 6px; }
+.outside-hours summary { cursor: pointer; }
+.calendar-timeline { background: #f8fafc; padding-bottom: 20px; }
+.day-column { position: relative; border-right: 1px solid #cbd5e1; background: white; }
+.hour-tick { position: absolute; left: 0; right: 0; border-top: 1px solid #e2e8f0; pointer-events: none; }
+.hour-tick time { position: absolute; top: 3px; left: 3px; width: 64px; font-size: 10px; line-height: 13px; color: #475569; }
+.day-activities { position: absolute; inset: 0 4px 0 70px; }
+.activity-card { position: absolute; border: 1px solid #cbd5e1; border-inline-start: 4px solid; border-radius: 4px; padding: 4px; overflow: hidden; font-size: 0.75rem; }
+.activity-card strong, .activity-card > span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.activity-card > span { margin-top: 4px; font-size: 0.65rem; }
+.activity-card.is-completed { opacity: 0.7; }
+.activity-card:focus-within { outline: 3px solid #2563eb; outline-offset: -3px; }
+.planner .activity-inspect { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: transparent; padding: 0; border-radius: 0; }
+.activity-details { max-width: min(400px, 90vw); border: 1px solid #94a3b8; border-radius: 8px; padding: 24px; color: #0f172a; font: 1rem system-ui, sans-serif; overflow-wrap: anywhere; }
+.activity-details::backdrop { background: #0f172a30; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 1100px) {
+  .planner-workspace { flex-direction: column; align-items: stretch; }
+  .unscheduled-panel { flex-basis: auto; }
+  .calendar-scroll { flex: auto; width: 100%; }
+}
+@media (max-width: 600px) {
+  .page-content:has(.planner) { padding: 12px; }
+  .planner h1 { font-size: 1.4rem; }
+}
