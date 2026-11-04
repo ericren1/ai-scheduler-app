@@ -63,13 +63,59 @@ function instant(timestamp: Timestamp): number {
   return value;
 }
 
-function localMidnight(date: LocalDate): number {
+export function localMidnight(date: LocalDate): number {
   const anchor = dateAnchor(date);
   const local = new Date(0);
   local.setFullYear(anchor.getUTCFullYear(), anchor.getUTCMonth(), anchor.getUTCDate());
   local.setHours(0, 0, 0, 0);
   if (toLocalDate(local) !== date) throw new RangeError('Date does not exist in local timezone');
   return local.getTime();
+}
+
+export function formatCalendarDate(date: LocalDate, options: Intl.DateTimeFormatOptions): string {
+  // Format civil dates using a UTC anchor, so the day cannot shift with timezone.
+  return new Intl.DateTimeFormat(undefined, { ...options, timeZone: 'UTC' }).format(dateAnchor(date));
+}
+
+export function formatTime(timestamp: Timestamp): string {
+  return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(instant(timestamp));
+}
+
+/** Resolve a wall-clock display window to the existing elapsed-time axis. */
+export function getDayWindow(date: LocalDate, startHour = 6, endHour = 23, pixelsPerHour = 60) {
+  if (!Number.isInteger(startHour) || !Number.isInteger(endHour)
+    || startHour < 0 || endHour > 24 || startHour >= endHour
+    || !Number.isFinite(pixelsPerHour) || pixelsPerHour <= 0) {
+    throw new RangeError('Expected ordered hours within 0–24 and a positive scale');
+  }
+  const midnight = localMidnight(date);
+  function boundary(hour: number) {
+    if (hour === 24) return localMidnight(addCalendarDays(date, 1));
+    // A nonexistent boundary advances to the first representable hour;
+    // an ambiguous boundary uses the earlier occurrence (Date compatible policy).
+    const value = new Date(midnight);
+    value.setHours(hour, 0, 0, 0);
+    return value.getTime();
+  }
+  const start = boundary(startHour);
+  const end = boundary(endHour);
+  if (end < start) throw new RangeError('Display window ends before it starts');
+  const ticks: { timestamp: string; label: string; top: number }[] = [];
+  // Walk instants, not wall hours: repeated hours get distinct positions.
+  for (let value = start; start < end && value <= end; value += 60 * MINUTE_MS) {
+    ticks.push({
+      timestamp: new Date(value).toISOString(),
+      label: new Intl.DateTimeFormat(undefined, {
+        hour: 'numeric', minute: '2-digit', timeZoneName: 'shortOffset',
+      }).format(value),
+      top: (value - start) / (60 * MINUTE_MS) * pixelsPerHour,
+    });
+  }
+  return {
+    start, end, ticks,
+    visibleStartMinutes: (start - midnight) / MINUTE_MS,
+    height: (end - start) / (60 * MINUTE_MS) * pixelsPerHour,
+  };
 }
 
 export function plannedDurationMinutes(startAt: Timestamp, endAt: Timestamp): number {

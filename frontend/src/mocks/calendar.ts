@@ -13,6 +13,11 @@ export const mockRecurrenceRules: RecurrenceRule[] = [{
 
 export const mockTasks: Task[] = [
   {
+    id: 'read', title: 'Read about accessible calendars', categoryId: 'engineering',
+    tags: ['learning'], priorityRank: 5, status: 'active', completionType: 'one-time',
+    schedulingMode: 'on-demand', allowedWeekdays: [1, 2, 3, 4, 5, 6, 7],
+  },
+  {
     id: 'scheduler', title: 'Build AI Scheduler', categoryId: 'engineering',
     tags: ['learning'], priorityRank: 1, status: 'active', completionType: 'one-time',
     schedulingMode: 'flexible', allowedWeekdays: [1, 2, 3, 4, 5],
