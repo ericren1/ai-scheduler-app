@@ -69,6 +69,12 @@ Open a PR targeting `main` when the feature is ready. Use a draft PR if meaningf
 
 Review the final changes, test results, and any automated checks. Address feedback with further commits and rerun checks appropriate to the changes. Browser checks must be reported as pending if they were not actually performed. Do not claim CI passed unless a workflow ran successfully; local validation is separate evidence.
 
+### Automated GitHub checks
+
+`.github/workflows/frontend-ci.yml` runs on pull requests and pushes to `main` and the documented branch prefixes. The `Frontend checks (Node 22)` job uses an Ubuntu runner, installs dependencies with `npm ci`, then runs tests, lint, and the production build in `frontend`. Tests already cover UTC, Toronto, and Berlin. npm's download cache is keyed by the lockfile; generated dependencies and builds are not committed. Superseded runs are canceled. The workflow has read-only repository permissions and does not deploy, commit, push, or merge.
+
+New pull requests use `.github/pull_request_template.md` to make validation and dependencies explicit. CI complements browser review rather than replacing it. Until this workflow reaches `main`, older independent branches may not contain it. In GitHub repository settings, the owner can later require the `Frontend checks (Node 22)` status on protected `main`; adding the YAML alone does not enable branch protection. Security-sensitive Actions use the upstream-maintained `actions/checkout` and `actions/setup-node` actions; review action-version upgrades as normal dependency changes.
+
 Merge only after review, successful validation, and explicit approval. Prefer GitHub's merge-commit option during the initial migration so existing commit history is preserved. Do not automatically merge a PR or bypass failing checks. Repository branch protections and required checks must be configured separately; this document does not enforce them.
 
 ## After merging
