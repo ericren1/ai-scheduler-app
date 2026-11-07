@@ -1,22 +1,26 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useState } from "react";
+import Icon from '../ui/Icon.tsx';
 
 const navigation = [
-  { name: "Planner", path: "/" },
-  { name: "Tasks", path: "/tasks" },
-  { name: "Goals", path: "/goals" },
-  { name: "Settings", path: "/settings" },
-];
+  { name: "Planner", path: "/", icon: 'calendar' },
+  { name: "Tasks", path: "/tasks", icon: 'tasks' },
+  { name: "Goals", path: "/goals", icon: 'goals' },
+  { name: "Settings", path: "/settings", icon: 'settings' },
+] as const;
 
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <div className="app-layout">
-      <aside className={`sidebar ${sidebarOpen ? "" : "collapsed"}`}>
-        <h2>{sidebarOpen ? "AI Scheduler" : "AI"}</h2>
+      <aside id="app-navigation" className={`sidebar ${sidebarOpen ? "" : "collapsed"}`} aria-label="Workspace navigation">
+        <div className="workspace-brand"><span className="workspace-monogram" aria-hidden="true">P</span>{sidebarOpen && <div><h2>Personal Hub</h2><span>Personal workspace</span></div>}</div>
+        <button className="sidebar-toggle" type="button" onClick={() => setSidebarOpen(open => !open)}
+          aria-label={sidebarOpen ? 'Collapse navigation' : 'Expand navigation'} aria-expanded={sidebarOpen} aria-controls="workspace-links" title={sidebarOpen ? 'Collapse navigation' : 'Expand navigation'}><Icon name="panel" /></button>
+        {sidebarOpen && <p className="navigation-label">Workspace</p>}
 
-        <nav>
+        <nav id="workspace-links">
           {navigation.map((item) => (
             <NavLink
               key={item.path}
@@ -26,24 +30,16 @@ export default function AppLayout() {
                 isActive ? "nav-link active" : "nav-link"
               }
               title={item.name}
+              aria-label={item.name}
             >
-              {sidebarOpen ? item.name : item.name.charAt(0)}
+              <Icon name={item.icon} />{sidebarOpen && <span>{item.name}</span>}
             </NavLink>
           ))}
         </nav>
+        {sidebarOpen && <div className="sidebar-footer"><span className="workspace-avatar" aria-hidden="true">P</span><div>Personal space<small>A little more intentional.</small></div></div>}
       </aside>
 
       <div className="main-area">
-        <header className="app-header">
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            ☰
-          </button>
-          <span>AI Scheduler</span>
-        </header>
-
         <main className="page-content">
           <Outlet />
         </main>

@@ -5,10 +5,12 @@ import PlannerPage from "./pages/PlannerPage";
 import TasksPage from "./pages/TasksPage";
 import GoalsPage from "./pages/GoalsPage";
 import SettingsPage from "./pages/SettingsPage";
+import SchedulingPreferencesProvider from './state/SchedulingPreferencesProvider.tsx';
+import ThemeProvider from './state/ThemeProvider.tsx';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <ThemeProvider><SchedulingPreferencesProvider><BrowserRouter>
       <Routes>
         <Route element={<AppLayout />}>
           <Route index element={<PlannerPage />} />
@@ -17,6 +19,6 @@ export default function App() {
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </BrowserRouter></SchedulingPreferencesProvider></ThemeProvider>
   );
 }

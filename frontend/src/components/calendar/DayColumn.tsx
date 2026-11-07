@@ -3,13 +3,13 @@ import { categoryColor } from '../../utils/calendarView.ts';
 import type { CalendarRecords, layoutDay } from '../../utils/calendarView.ts';
 import ActivityCard from './ActivityCard.tsx';
 
-export default function DayColumn({ date, layout, records }: {
-  date: LocalDate; layout: ReturnType<typeof layoutDay>; records: CalendarRecords;
+export default function DayColumn({ date, layout, records, showLabels = false }: {
+  date: LocalDate; layout: ReturnType<typeof layoutDay>; records: CalendarRecords; showLabels?: boolean;
 }) {
-  return <section className="day-column" aria-label={`Hourly activities for ${date}`} style={{ height: layout.window.height || 48 }}>
+  return <section className={`day-column ${showLabels ? 'has-local-labels' : ''}`} aria-label={`Hourly activities for ${date}`} style={{ height: layout.window.height || 48 }}>
     {layout.window.height === 0 && <p className="calendar-muted">This local hour is skipped by a clock change.</p>}
     {layout.window.ticks.map(tick => <div key={tick.timestamp} className="hour-tick" style={{ top: tick.top }}>
-      <time dateTime={tick.timestamp}>{tick.label}</time>
+      {showLabels && <time dateTime={tick.timestamp}>{tick.label}</time>}
     </div>)}
     <div className="day-activities">
       {layout.items.map(item => <ActivityCard key={`${'status' in item.activity ? 'session' : 'event'}-${item.activity.id}`} activity={item.activity}
