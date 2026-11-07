@@ -9,6 +9,14 @@ export interface CalendarRecords {
   categories: readonly Category[];
 }
 
+/** Share hour labels only when geometry AND local labels match across all days. */
+export function canShareTimeAxis(windows: readonly ReturnType<typeof getDayWindow>[]): boolean {
+  if (windows.length === 0) return false;
+  const first = windows[0];
+  return windows.every(window => window.height === first.height && window.ticks.length === first.ticks.length
+    && window.ticks.every((tick, index) => tick.top === first.ticks[index].top && tick.label === first.ticks[index].label));
+}
+
 export function getTimedActivities(records: CalendarRecords): TimedActivity[] {
   return [...records.sessions.filter((s): s is TimedSession => s.kind === 'timed'),
     ...records.events.filter((e): e is Extract<CalendarEvent, { kind: 'timed' }> => e.kind === 'timed')];

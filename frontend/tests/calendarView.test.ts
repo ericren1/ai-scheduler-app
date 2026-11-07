@@ -1,11 +1,23 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { activitiesForDate, categoryColor, getTimedActivities, layoutDay, unscheduledTasks } from '../src/utils/calendarView.ts';
+import { activitiesForDate, canShareTimeAxis, categoryColor, getTimedActivities, layoutDay, unscheduledTasks } from '../src/utils/calendarView.ts';
 import type { CalendarRecords, TimedActivity } from '../src/utils/calendarView.ts';
 import { mockCategories, mockEvents, mockSessions, mockTasks } from '../src/mocks/calendar.ts';
 import { getDayWindow, getSessionPosition, formatCalendarDate } from '../src/utils/calendarDate.ts';
 
 const records: CalendarRecords = { tasks: mockTasks, sessions: mockSessions, events: mockEvents, categories: mockCategories };
+
+test('shared hour labels require identical local labels and geometry', () => {
+  assert.equal(canShareTimeAxis([]), false);
+  assert.equal(canShareTimeAxis(['2026-10-19', '2026-10-20'].map(date => getDayWindow(date, 6, 23))), true);
+  assert.equal(canShareTimeAxis([getDayWindow('2026-10-19', 6, 23), getDayWindow('2026-10-20', 7, 23)]), false);
+  const spring = process.env.TZ === 'America/Toronto' ? '2026-03-08' : '2026-03-29';
+  if (process.env.TZ !== 'UTC') {
+    assert.equal(canShareTimeAxis([getDayWindow('2026-03-02', 0, 24), getDayWindow(spring, 0, 24)]), false);
+    // Equal height alone is insufficient when a week crosses an offset change.
+    assert.equal(canShareTimeAxis([getDayWindow('2026-03-02', 6, 23), getDayWindow(spring, 6, 23)]), false);
+  }
+});
 function activity(id: string, startHour: number, endHour: number): TimedActivity {
   return { id, title: id, kind: 'timed', startAt: new Date(2026, 9, 22, startHour).toISOString(),
     endAt: new Date(2026, 9, 22, endHour).toISOString(), commitment: 'fixed' };

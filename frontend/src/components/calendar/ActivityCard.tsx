@@ -11,8 +11,8 @@ export default function ActivityCard({ activity, color, style, height, instanceK
   const placement = 'placement' in activity ? activity.placement : activity.commitment;
   const description = `${activity.title}. ${time}. ${status}. ${placement}.${activity.notes ? ` ${activity.notes}` : ''}`;
   return <article className={`activity-card ${completed ? 'is-completed' : ''}`}
-    style={{ ...style, borderInlineStartColor: color, backgroundColor: `color-mix(in srgb, ${color} 12%, white)` }}>
-    <strong>{completed ? '✓ ' : ''}{activity.title}</strong>
+    style={{ ...style, '--category-color': color } as CSSProperties}>
+    <strong className={height >= 64 ? 'activity-title-wrap' : ''}>{completed && <span className="completion-mark" aria-hidden="true">✓ </span>}{activity.title}</strong>
     {height >= 48 && <span>{time}</span>}
     {height >= 78 && <span>{status} · {placement}</span>}
     <button className="activity-inspect" aria-label={description} title={description} popoverTarget={instanceKey}>
