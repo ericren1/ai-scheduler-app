@@ -7,10 +7,12 @@ import GoalsPage from "./pages/GoalsPage";
 import SettingsPage from "./pages/SettingsPage";
 import SchedulingPreferencesProvider from './state/SchedulingPreferencesProvider.tsx';
 import ThemeProvider from './state/ThemeProvider.tsx';
+import CalendarProvider from './state/CalendarProvider.tsx';
+import './components/scheduler/scheduler.css';
 
 export default function App() {
   return (
-    <ThemeProvider><SchedulingPreferencesProvider><BrowserRouter>
+    <ThemeProvider><SchedulingPreferencesProvider><BrowserRouter><CalendarProvider>
       <Routes>
         <Route element={<AppLayout />}>
           <Route index element={<PlannerPage />} />
@@ -19,6 +21,6 @@ export default function App() {
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>
-    </BrowserRouter></SchedulingPreferencesProvider></ThemeProvider>
+    </CalendarProvider></BrowserRouter></SchedulingPreferencesProvider></ThemeProvider>
   );
 }

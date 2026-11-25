@@ -4,6 +4,8 @@ import type { SchedulingPreferences } from '../types/preferences.ts';
 export const SchedulingPreferencesContext = createContext<{
   preferences: SchedulingPreferences;
   setBedtime: (time: string) => boolean;
+  updatePreferences: (preferences: SchedulingPreferences) => { ok: boolean; error?: string };
+  warning: string;
 } | null>(null);
 
 export function useSchedulingPreferences() {

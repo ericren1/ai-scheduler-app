@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { realisticCalendar, realisticSampleWeek } from '../../mocks/realisticCalendar.ts';
 import type { CalendarRecords } from '../../utils/calendarView.ts';
 import ToolbarMenu from './ToolbarMenu.tsx';
+import { mockCategories, mockEvents, mockSessions, mockTasks } from '../../mocks/calendar.ts';
 
-export default function DevelopmentSamples({ synthetic, onSelect }: {
-  synthetic: CalendarRecords; onSelect: (records: CalendarRecords, week: string, label: string) => void;
+export default function DevelopmentSamples({ onSelect }: {
+  onSelect: (records: CalendarRecords, week: string, label: string) => void;
 }) {
   const [selected, setSelected] = useState('synthetic');
   function openSample(value: string) {
     setSelected(value);
-    onSelect(value === 'realistic' ? realisticCalendar : synthetic,
+    onSelect(value === 'realistic' ? realisticCalendar : { tasks: mockTasks, sessions: mockSessions, events: mockEvents, categories: mockCategories },
       value === 'realistic' ? realisticSampleWeek : '2026-10-19',
       value === 'realistic' ? 'Realistic sample' : 'Synthetic sample');
   }

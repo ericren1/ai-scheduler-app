@@ -2,15 +2,15 @@
 
 ## Tokens and scope
 
-`frontend/src/tokens.css` is the palette source of truth. The root defaults to Deep Indigo, using the approved visual reference: purple-tinted dark surfaces, lavender selection/focus, teal success, and warm amber accents. `:root[data-theme='light']` overrides semantic colors while sharing typography, spacing, radii, and layout geometry. Browser `color-scheme` follows the selected theme so native selects, time inputs, and scrollbars agree with the workspace.
+`frontend/src/tokens.css` is the palette source of truth. The root defaults to Deep Indigo: graphite-indigo surfaces, lavender selection/focus, teal success, and warm amber accents. The current base palette is background `#171923`, calendar `#1b1e2b`, elevated surface `#272b3c`, primary text `#f2f3fa`, accent `#c1b3ff`, and success `#70d3be`. `:root[data-theme='light']` overrides semantic colors while sharing typography, spacing, radii, and layout geometry. Browser `color-scheme` follows the selected theme so native selects, time inputs, and scrollbars agree with the workspace.
 
-The compact Planner footer echoes the reference's palette strip using the actual semantic tokens, and links to Settings. It takes 30px of viewport height; calendar scrolling fills the remaining space without page overflow. It is not a set of inert theme-switch buttons. The dark storage value remains `dark` to preserve existing selections, while Settings displays the name Deep Indigo. Light mode remains available with its own palette.
+The compact Planner footer shows the active appearance and local timezone, and links to Settings. Its minimum height is 28px; calendar scrolling fills the remaining space without page overflow. Decorative palette swatches have been removed. The dark storage value remains `dark` to preserve existing selections, while Settings displays the name Deep Indigo. Light mode remains available with its own palette.
 
 Components consume semantic variables: `--background`, `--surface`, `--surface-subtle`, `--surface-sidebar`, `--surface-elevated`, `--surface-hover`, text variants, borders, selection, focus, scrollbar, backdrop, and shadows. Indigo represents selection/navigation/focus, teal represents completion/success, and amber marks development tooling and future warning states. These roles can be reused by Training, Insights, and other future modules without introducing module-specific palettes.
 
 Activity categories remain data, not theme definitions. Cards receive their canonical category color through a CSS custom property; their background tint and border are mixed against the active theme's semantic surfaces/text. Dark mode uses lifted category borders and subdued graphite tints. Light mode uses pale category fills and darker borders. Missing category data retains the existing view-helper fallback. Neither category records nor scheduling models change.
 
-Completed activities use a reduced background tint and secondary text rather than container opacity, preserving readable labels and native popover details. The completion check uses the semantic success color. Hover, focus, disabled, invalid-input, native selected options, and active navigation states are themed. Today uses a solid accent wash, bottom border, and contrasting date circle; no gradient is needed.
+Completed activities use a reduced background tint and secondary text rather than container opacity, preserving readable labels and native popover details. The completion check uses the semantic success color. Hover, focus, disabled, invalid-input, native selected options, and active navigation states are themed. Today uses a subtle accent wash and contrasting date circle. Weekend headers use a separate subtle surface.
 
 ## State and local persistence
 
@@ -19,11 +19,19 @@ Completed activities use a reduced background tint and secondary text rather tha
 - `src/state/ThemeContext.ts` and `ThemeProvider.tsx`: shared React state, root attribute synchronization, and persistence status. Storage writes happen during initialization and explicit theme selection, separately from scheduling preferences.
 - Settings → Appearance exposes a labeled native select. Selection applies immediately across routes and reloads without a backend. An inaccessible/full storage area falls back safely; session theme changes still work and Settings reports that they cannot be saved.
 
-There is no automatic system-theme option, cross-tab synchronization, account synchronization, or theme scheduling in this increment. Browser-local persistence is scoped to the current origin, so a different host/port has its own selection. Daily scheduling preferences remain in-memory as before; saving a theme does not make scheduling settings persistent.
+There is no automatic system-theme option, cross-tab synchronization, account synchronization, or theme scheduling in this increment. Browser-local persistence is scoped to the current origin, so a different host/port has its own selection. Sleep/work scheduling preferences have their own separately versioned browser-local store; changing a theme never changes that schedule.
 
 ## Layout and calendar invariants
 
-This pass preserves the compact toolbar, sidebar widths/collapse, row expansion, responsive breakpoints, and elapsed-time calendar geometry. It does not change date utilities, DST rules, data models, record placement, or read-only behavior. Calendar scrolling retains a stable scrollbar gutter to reduce width shifts; toolbar menus have bounded internal scrolling in shorter viewports. Tasks, Goals, and Settings inherit global themed surfaces and text.
+The UI overhaul keeps the calendar dominant with a compact toolbar, grouped week navigation, and a shortened date range that handles month/year boundaries. The sidebar is 200px (180px at narrower desktop widths) or a 60px icon rail. Below 760px it starts collapsed; expanded navigation overlays the content with a dismissible scrim and closes after choosing a route. Crossing into the narrow breakpoint also collapses it. A skip link reaches the main content.
+
+Unscheduled tasks occupy a right-hand panel on wide desktops and overlay the calendar below 1200px. Opening focuses its Close button; Escape closes it and restores trigger focus. At phone widths toolbar disclosures use bounded sheets above the footer to avoid extending beyond the viewport. The weekly calendar still scrolls horizontally on narrow screens; a mobile daily view is deferred.
+
+Tasks has a flat list with category markers, linked-session rows, title search, and category filtering. These filters are view state and never write calendar records. Settings has section links and grouped native forms. Goals explicitly explains that goal tracking is not yet available. Existing session creation/editing/completion remains functional.
+
+Date utilities, DST rules, data models, record placement, storage formats, and scheduling validation are unchanged. Calendar scrolling retains a stable scrollbar gutter; toolbar menus have bounded internal scrolling. Typography uses the existing local/system sans-serif stack, with tabular time labels, avoiding new font downloads. Color is concentrated on activity categories and selected states. Reduced-motion settings disable transitions.
+
+Shared shell styles live in `index.css`, calendar styles in `components/calendar/calendar.css`, and page/form/settings styles in `components/scheduler/scheduler.css`. UI/UX Pro Max and frontend-design skill guidance informed hierarchy, accessible controls, semantic tokens, and screenshot review. The optional Python search CLI was unavailable; no runtime or dependencies were installed.
 
 ## Verification
 

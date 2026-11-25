@@ -4,9 +4,12 @@ import { canShareTimeAxis, getTimedActivities, layoutDay } from '../../utils/cal
 import type { CalendarRecords } from '../../utils/calendarView.ts';
 import CalendarDateRows from './CalendarDateRows.tsx';
 import DayColumn from './DayColumn.tsx';
+import type { SchedulingPreferences } from '../../types/preferences.ts';
+import { positionScheduleBands } from '../../utils/dailySchedule.ts';
 
-export default function WeekCalendar({ week, records, startHour, endHour, pixelsPerHour = 60 }: {
-  week: LocalDate; records: CalendarRecords; startHour: number; endHour: number; pixelsPerHour?: number;
+export default function WeekCalendar({ week, records, startHour, endHour, pixelsPerHour = 60, onSessionEdited, schedulePreferences }: {
+  week: LocalDate; records: CalendarRecords; startHour: number; endHour: number; pixelsPerHour?: number; onSessionEdited?: (date: string) => void;
+  schedulePreferences?: SchedulingPreferences;
 }) {
   const dates = getWeekDates(week);
   const timed = getTimedActivities(records);
@@ -17,14 +20,14 @@ export default function WeekCalendar({ week, records, startHour, endHour, pixels
     <div className={`calendar-sheet ${sharedAxis ? '' : 'calendar-local-axes'}`}>
       <div className="calendar-header-row"><div className="calendar-corner" aria-hidden="true">Week</div>
       <div className="calendar-seven-columns calendar-day-headers">
-        {dates.map(date => <div key={date} className={isToday(date) ? 'calendar-today' : ''}>
+        {dates.map((date, index) => <div key={date} className={`${isToday(date) ? 'calendar-today' : ''} ${index >= 5 ? 'calendar-weekend' : ''}`}>
           <span className="day-name">{formatCalendarDate(date, { weekday: 'short' })}</span>
           <time dateTime={date} aria-label={formatCalendarDate(date, { weekday: 'long', month: 'long', day: 'numeric' })}>{formatCalendarDate(date, { day: 'numeric' })}</time>
           {isToday(date) && <span className="today-label">Today</span>}
         </div>)}
       </div></div>
-      <CalendarDateRows dates={dates} records={records} kind="allDay" />
-      <CalendarDateRows dates={dates} records={records} kind="untimed" />
+      <CalendarDateRows dates={dates} records={records} kind="allDay" onSessionEdited={onSessionEdited} />
+      <CalendarDateRows dates={dates} records={records} kind="untimed" onSessionEdited={onSessionEdited} />
       {layouts.some(layout => layout.outside.length > 0) && <div className="calendar-seven-columns outside-hours">
         {layouts.map((layout, index) => <div key={dates[index]}>
           {layout.outside.length > 0 && <details><summary>{layout.outside.length} outside visible hours</summary>
@@ -39,7 +42,8 @@ export default function WeekCalendar({ week, records, startHour, endHour, pixels
             : <span className="local-axis-note">Local<br />times</span>}
         </div>
       <div className="calendar-seven-columns calendar-timeline" style={{ minHeight: timelineHeight }}>
-        {dates.map((date, index) => <DayColumn key={date} date={date} layout={layouts[index]} records={records} showLabels={!sharedAxis} />)}
+        {dates.map((date, index) => <DayColumn key={date} date={date} layout={layouts[index]} records={records} showLabels={!sharedAxis} onSessionEdited={onSessionEdited}
+          guidance={schedulePreferences ? positionScheduleBands(schedulePreferences, date, layouts[index].window, pixelsPerHour) : []} />)}
       </div>
       </div>
     </div>

@@ -2,6 +2,10 @@
 
 Personal Hub was formerly named AI Scheduler. Existing repository names and historical commit messages are retained until a separate rename is approved.
 
+## Current phase: basic scheduler on main
+
+On November 7, 2026, the user explicitly chose direct local development on `main` until the basic manual scheduler works. This instruction overrides the feature-branch convention below for this phase. Existing Planner commits were fast-forwarded onto local `main` without rewriting history. Keep changes small and validated; ask before publishing to GitHub. Do not automatically merge or close existing PRs. Return to dedicated branches for additions on top of the working scheduler, including AI/LLM features.
+
 ## Branches
 
 `main` represents stable, reviewed, working code. Do substantial work on a short-lived branch:

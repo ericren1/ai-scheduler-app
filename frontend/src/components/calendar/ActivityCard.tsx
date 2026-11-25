@@ -1,10 +1,13 @@
 import type { CSSProperties } from 'react';
 import type { TimedActivity } from '../../utils/calendarView.ts';
 import { formatTime } from '../../utils/calendarDate.ts';
+import { useCalendar } from '../../state/CalendarContext.ts';
 
-export default function ActivityCard({ activity, color, style, height, instanceKey }: {
-  activity: TimedActivity; color: string; style: CSSProperties; height: number; instanceKey: string;
+export default function ActivityCard({ activity, color, style, height, instanceKey, onSessionEdited }: {
+  activity: TimedActivity; color: string; style: CSSProperties; height: number; instanceKey: string; onSessionEdited?: (date: string) => void;
 }) {
+  const { records, completeSession, requestSessionEdit } = useCalendar();
+  const personalSession = 'status' in activity && records.sessions.some(session => session.id === activity.id);
   const status = 'status' in activity ? activity.status : activity.commitment;
   const completed = status === 'completed';
   const time = `${formatTime(activity.startAt)} – ${formatTime(activity.endAt)}`;
@@ -22,6 +25,11 @@ export default function ActivityCard({ activity, color, style, height, instanceK
       <h3>{activity.title}</h3><p>{time}</p><p>{status} · {placement}</p>
       {'actualTrackedMinutes' in activity && <p>Actual tracked: {activity.actualTrackedMinutes} minutes</p>}
       <p>{activity.notes}</p>
+      {personalSession && <button onClick={() => completeSession(activity.id, !completed)}>{completed ? 'Mark planned' : 'Mark completed'}</button>}
+      {personalSession && <button onClick={event => {
+        (event.currentTarget.closest('[popover]') as HTMLElement | null)?.hidePopover();
+        requestSessionEdit(activity.id, onSessionEdited);
+      }}>Edit session</button>}
       <button popoverTarget={instanceKey} popoverTargetAction="hide">Close</button>
     </div>
   </article>;

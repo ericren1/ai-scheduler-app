@@ -13,14 +13,21 @@ interface Props {
   endHour: number;
   onHoursChange: (start: number, end: number) => void;
   developmentMenu?: ReactNode;
+  creationControls?: ReactNode;
+  showGuidance?: boolean;
+  onToggleGuidance?: () => void;
 }
 
 export default function PlannerToolbar(props: Props) {
   const { week, onWeekChange, startHour, endHour, onHoursChange } = props;
   const dates = getWeekDates(week);
-  const format = (date: LocalDate) => formatCalendarDate(date, { month: 'short', day: 'numeric', year: 'numeric' });
+  const sameMonth = dates[0].slice(0, 7) === dates[6].slice(0, 7);
+  const sameYear = dates[0].slice(0, 4) === dates[6].slice(0, 4);
+  const range = sameYear
+    ? `${formatCalendarDate(dates[0], { month: 'short', day: 'numeric' })} – ${formatCalendarDate(dates[6], sameMonth ? { day: 'numeric' } : { month: 'short', day: 'numeric' })}, ${formatCalendarDate(dates[6], { year: 'numeric' })}`
+    : `${formatCalendarDate(dates[0], { month: 'short', day: 'numeric', year: 'numeric' })} – ${formatCalendarDate(dates[6], { month: 'short', day: 'numeric', year: 'numeric' })}`;
   return <header className="planner-toolbar">
-    <div className="planner-heading"><h1>Planner</h1><p aria-live="polite">{format(dates[0])} – {format(dates[6])}</p></div>
+    <div className="planner-heading"><h1>Planner</h1><p aria-live="polite">{range}</p></div>
     <div className="planner-controls">
       <div className="control-group" role="group" aria-label="Week navigation">
       <button className="icon-button" onClick={() => onWeekChange(previousWeek(week))} aria-label="Previous week"><Icon name="left" /></button>
@@ -36,9 +43,11 @@ export default function PlannerToolbar(props: Props) {
         {Array.from({ length: 24 - startHour }, (_, i) => startHour + i + 1).map(hour => <option key={hour} value={hour}>{hour === 24 ? '24:00' : `${String(hour).padStart(2, '0')}:00`}</option>)}
       </select></label>
       <button className="quiet-button" onClick={() => onHoursChange(0, 24)}>Full day</button>
+      {props.onToggleGuidance && <label className="checkbox-field"><input type="checkbox" checked={props.showGuidance} onChange={props.onToggleGuidance} />Show sleep/work plan</label>}
       <p className="menu-caption">{Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll('_', ' ')} · Local time</p>
       </ToolbarMenu>
       <div className="control-group">
+      {props.creationControls}
       <button aria-expanded={props.panelOpen} aria-controls="unscheduled-tasks" onClick={props.onTogglePanel}><Icon name="tasks" /> Tasks</button>
       {props.developmentMenu}
       </div>
