@@ -80,6 +80,23 @@ button.primary-button:not(:disabled):hover, .planner button.primary-button:not(:
 .session-dialog form { gap: 16px; }
 .session-dialog .form-actions { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 12px; }
 .session-dialog form > p { margin: 0; }
+.backup-import input[type='file'] { width: 100%; font-size: var(--font-sm); }
+.backup-import input::file-selector-button { font: inherit; color: var(--text); padding: 7px 10px; margin-right: 8px; background: var(--surface-hover); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; }
+.backup-preview { padding: 16px; background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); }
+.backup-preview dd { overflow-wrap: anywhere; }
+.backup-preview .form-actions { flex-wrap: wrap; }
+.task-record-meta, .task-actions, .session-list-actions, .untimed-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.task-record-meta { justify-content: space-between; margin-top: 6px; }
+.task-record-meta p { margin: 0; font-size: var(--font-sm); color: var(--text-secondary); }
+.task-record .task-completion-note { font-size: var(--font-xs); color: var(--success); }
+.task-completed .task-record-heading h2 { color: var(--text-secondary); }
+.session-snapshot-title { display: block; font-weight: 500; }
+.session-list-actions { flex-shrink: 0; }
+button.danger-text, .planner button.danger-text { color: var(--danger); }
+button.danger-button { color: var(--danger); border-color: var(--danger); }
+button.danger-button:not(:disabled):hover { background: color-mix(in srgb, var(--danger) 14%, var(--surface)); }
+.delete-session-dialog .form-actions, .session-dialog .form-actions { flex-wrap: wrap; }
+@media (max-width: 700px) { .task-record li { flex-wrap: wrap; } .session-list-actions { margin-left: auto; } }
 @media (max-width: 700px) { .tasks-heading .text-action { margin-bottom: 4px; } .task-result-count { margin-left: auto; } .task-record li { align-items: flex-start; } .task-record li label { flex: 1; min-width: 0; } }
 
 .settings-page { max-width: 800px; margin-inline: auto; }

@@ -6,6 +6,7 @@ export const SchedulingPreferencesContext = createContext<{
   setBedtime: (time: string) => boolean;
   updatePreferences: (preferences: SchedulingPreferences) => { ok: boolean; error?: string };
   warning: string;
+  acceptRestoredPreferences: (preferences: SchedulingPreferences) => void;
 } | null>(null);
 
 export function useSchedulingPreferences() {

@@ -17,7 +17,7 @@ function localClock(timestamp: string): string {
 export default function SessionDialog({ initialDate, session, onClose, onSaved }: {
   initialDate: string; session?: ScheduledSession; onClose: () => void; onSaved: (date: string) => void;
 }) {
-  const { records, addSession, editSession } = useCalendar();
+  const { records, addSession, editSession, requestSessionDelete } = useCalendar();
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const [taskId, setTaskId] = useState(session?.taskId ?? records.tasks.find(task => task.status === 'active')?.id ?? '');
@@ -57,7 +57,7 @@ export default function SessionDialog({ initialDate, session, onClose, onSaved }
       <p>Times in {Intl.DateTimeFormat().resolvedOptions().timeZone}. Scheduling a session never completes its task.</p>
       <label>Task<select required disabled={Boolean(session)} value={taskId} onChange={event => setTaskId(event.target.value)}><option value="" disabled>Choose a task</option>{records.tasks.filter(task => task.status === 'active' || task.id === session?.taskId).map(task => <option key={task.id} value={task.id}>{task.title}</option>)}</select></label>
       {session && <p>Only this session changes. Its linked task, completion, and tracked time are preserved.</p>}
-      {!records.tasks.length && <p><Link to="/tasks" onClick={onClose}>Create a task first</Link></p>}
+      {!session && !records.tasks.some(task => task.status === 'active') && <p><Link to="/tasks" onClick={onClose}>Create or reopen a task first</Link></p>}
       <label>Date<input type="date" required value={date} onChange={event => { setDate(event.target.value); setEndDate(event.target.value); setStartOccurrence(''); setEndOccurrence(''); }} /></label>
       <label className="checkbox-field"><input type="checkbox" checked={untimed} onChange={event => setUntimed(event.target.checked)} />Assign to this day without a time</label>
       {!untimed && <>
@@ -79,7 +79,7 @@ export default function SessionDialog({ initialDate, session, onClose, onSaved }
       </>}
       <label>Placement<select value={placement} onChange={event => setPlacement(event.target.value as 'fixed' | 'flexible')}><option value="flexible">Flexible work</option><option value="fixed">Fixed commitment</option></select></label>
       {error && <p className="form-error" role="alert">{error}</p>}
-      <div className="form-actions"><button type="button" onClick={onClose}>Cancel</button><button className="primary-button" type="submit" disabled={!taskId}>{session ? 'Save changes' : 'Create session'}</button></div>
+      <div className="form-actions">{session && <button type="button" className="danger-text" onClick={() => { onClose(); requestSessionDelete(session.id); }}>Delete session</button>}<button type="button" onClick={onClose}>Cancel</button><button className="primary-button" type="submit" disabled={!taskId}>{session ? 'Save changes' : 'Create session'}</button></div>
     </form>
   </dialog>;
 }

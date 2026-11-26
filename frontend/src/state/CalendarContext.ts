@@ -9,6 +9,10 @@ export const CalendarContext = createContext<{
   completeSession: (id: string, completed: boolean) => void;
   editSession: (id: string, input: SessionInput) => void;
   requestSessionEdit: (id: string, onSaved?: (date: string) => void) => void;
+  acceptRestoredCalendar: (records: CalendarRecords) => void;
+  editTask: (id: string, title: string, categoryId: string) => void;
+  completeTask: (id: string, completed: boolean) => void;
+  requestSessionDelete: (id: string) => void;
 } | null>(null);
 
 export function useCalendar() {

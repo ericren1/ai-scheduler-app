@@ -6,7 +6,7 @@ import { useCalendar } from '../../state/CalendarContext.ts';
 export default function ActivityCard({ activity, color, style, height, instanceKey, onSessionEdited }: {
   activity: TimedActivity; color: string; style: CSSProperties; height: number; instanceKey: string; onSessionEdited?: (date: string) => void;
 }) {
-  const { records, completeSession, requestSessionEdit } = useCalendar();
+  const { records, completeSession, requestSessionEdit, requestSessionDelete } = useCalendar();
   const personalSession = 'status' in activity && records.sessions.some(session => session.id === activity.id);
   const status = 'status' in activity ? activity.status : activity.commitment;
   const completed = status === 'completed';
@@ -30,6 +30,10 @@ export default function ActivityCard({ activity, color, style, height, instanceK
         (event.currentTarget.closest('[popover]') as HTMLElement | null)?.hidePopover();
         requestSessionEdit(activity.id, onSessionEdited);
       }}>Edit session</button>}
+      {personalSession && <button className="danger-text" onClick={event => {
+        (event.currentTarget.closest('[popover]') as HTMLElement | null)?.hidePopover();
+        requestSessionDelete(activity.id);
+      }}>Delete session</button>}
       <button popoverTarget={instanceKey} popoverTargetAction="hide">Close</button>
     </div>
   </article>;

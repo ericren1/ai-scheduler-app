@@ -52,6 +52,27 @@ export function setSessionCompleted(records: CalendarRecords, id: string, comple
   return { ...records, sessions: records.sessions.map(session => session.id === id ? { ...session, status: completed ? 'completed' : 'planned' } : session) };
 }
 
+/** Task details apply to future sessions; existing sessions keep their saved snapshots. */
+export function editTask(records: CalendarRecords, id: string, title: string, categoryId: string): CalendarRecords {
+  if (!records.tasks.some(task => task.id === id)) throw new Error('Task not found.');
+  const validated = createTask({ ...records, tasks: records.tasks.filter(task => task.id !== id) }, id, title, categoryId);
+  return { ...records, tasks: records.tasks.map(task => task.id === id ? { ...task, title: validated.title, categoryId } : task) };
+}
+
+/** Explicit task completion never changes session completion, timing, or tracked time. */
+export function setTaskCompleted(records: CalendarRecords, id: string, completed: boolean): CalendarRecords {
+  const task = records.tasks.find(task => task.id === id);
+  if (!task) throw new Error('Task not found.');
+  if (task.status === 'archived') throw new Error('Archived tasks cannot be changed here.');
+  return { ...records, tasks: records.tasks.map(task => task.id === id ? { ...task, status: completed ? 'completed' : 'active' } : task) };
+}
+
+/** Removes one session, leaving the task and all sibling sessions unchanged. */
+export function deleteSession(records: CalendarRecords, id: string): CalendarRecords {
+  if (!records.sessions.some(session => session.id === id)) throw new Error('Session not found.');
+  return { ...records, sessions: records.sessions.filter(session => session.id !== id) };
+}
+
 /** Moving is measured in elapsed minutes, including overnight and DST intervals. */
 export function sessionEndAfterMove(session: ScheduledSession, startAt: string): string {
   if (session.kind !== 'timed') throw new Error('Untimed sessions have no duration to preserve.');
@@ -66,7 +87,10 @@ export function editSession(records: CalendarRecords, id: string, input: Session
   if (!original) throw new Error('Session not found.');
   if (original.taskId !== input.taskId) throw new Error('Editing a session cannot change its linked task.');
   // Validate against every OTHER activity. The old interval cannot conflict with itself.
-  const validated = createSession({ ...records, sessions: records.sessions.filter(session => session.id !== id) }, id, input);
+  // Existing sessions remain editable after their task is completed. This local
+  // validation copy permits that edit without reopening the canonical task.
+  const validated = createSession({ ...records, tasks: records.tasks.map(task => task.id === original.taskId && task.status === 'completed' ? { ...task, status: 'active' } : task),
+    sessions: records.sessions.filter(session => session.id !== id) }, id, input);
   function metadata(session: ScheduledSession) {
     if (session.kind === 'timed') {
       const { kind: _kind, startAt: _start, endAt: _end, ...rest } = session;

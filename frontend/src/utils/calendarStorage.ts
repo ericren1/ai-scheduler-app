@@ -3,8 +3,8 @@ import type { CalendarRecords } from './calendarView.ts';
 import type { ThemeStorage } from './theme.ts';
 import type { ScheduledSession, Task } from '../types/calendar.ts';
 import { plannedDurationMinutes } from './calendarDate.ts';
-
-export const CALENDAR_STORAGE_KEY = 'personal-hub.calendar.v1';
+import { CALENDAR_STORAGE_KEY } from './backupStorage.ts';
+export { CALENDAR_STORAGE_KEY } from './backupStorage.ts';
 
 /** Only this increment's user-created fields are accepted. Invalid data stays untouched. */
 export function decodeCalendar(raw: string): CalendarRecords {
@@ -14,7 +14,7 @@ export function decodeCalendar(raw: string): CalendarRecords {
   const taskIds = new Set<string>();
   for (const task of value.tasks) {
     if (!task || typeof task.id !== 'string' || !task.id || taskIds.has(task.id) || typeof task.title !== 'string' || !task.title.trim()
-      || !defaults.categories.some(category => category.id === task.categoryId) || task.status !== 'active'
+      || !defaults.categories.some(category => category.id === task.categoryId) || !['active', 'completed'].includes(task.status)
       || task.completionType !== 'one-time' || task.schedulingMode !== 'on-demand' || !Number.isFinite(task.priorityRank)
       || !Array.isArray(task.tags) || !task.tags.every((tag: unknown) => typeof tag === 'string')
       || !Array.isArray(task.allowedWeekdays) || !task.allowedWeekdays.every((day: unknown) => Number.isInteger(day) && Number(day) >= 1 && Number(day) <= 7)) throw new Error('Invalid saved task.');
@@ -26,6 +26,7 @@ export function decodeCalendar(raw: string): CalendarRecords {
       || typeof session.title !== 'string' || !session.title.trim() || !['fixed', 'flexible'].includes(session.placement)
       || !['planned', 'in-progress', 'completed', 'partial', 'missed', 'skipped'].includes(session.status) || typeof session.finalized !== 'boolean'
       || (session.notes !== undefined && typeof session.notes !== 'string')
+      || (session.categoryId !== undefined && !defaults.categories.some(category => category.id === session.categoryId))
       || (session.actualTrackedMinutes !== undefined && (!Number.isFinite(session.actualTrackedMinutes) || session.actualTrackedMinutes < 0))) throw new Error('Invalid saved session.');
     if (session.kind === 'untimed') {
       if (typeof session.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(session.date)
@@ -40,11 +41,11 @@ export function decodeCalendar(raw: string): CalendarRecords {
   }
   // Whitelist fields rather than spreading untrusted saved objects into React.
   const tasks: Task[] = value.tasks.map((task: Task) => ({ id: task.id, title: task.title, categoryId: task.categoryId,
-    tags: [...task.tags], priorityRank: task.priorityRank, status: 'active', completionType: 'one-time',
+    tags: [...task.tags], priorityRank: task.priorityRank, status: task.status, completionType: 'one-time',
     schedulingMode: 'on-demand', allowedWeekdays: [...task.allowedWeekdays] }));
   const sessions: ScheduledSession[] = value.sessions.map((session: ScheduledSession) => {
     const task = tasks.find(item => item.id === session.taskId)!;
-    const base = { id: session.id, taskId: task.id, title: session.title, categoryId: task.categoryId,
+    const base = { id: session.id, taskId: task.id, title: session.title, categoryId: session.categoryId ?? task.categoryId,
       status: session.status, placement: session.placement, finalized: session.finalized };
     const metadata = { ...base, ...(session.notes === undefined ? {} : { notes: session.notes }),
       ...(session.actualTrackedMinutes === undefined ? {} : { actualTrackedMinutes: session.actualTrackedMinutes }) };

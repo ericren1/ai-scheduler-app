@@ -8,7 +8,7 @@ import { useCalendar } from '../../state/CalendarContext.ts';
 export default function CalendarDateRows({ dates, records, kind, onSessionEdited }: {
   dates: LocalDate[]; records: CalendarRecords; kind: 'allDay' | 'untimed'; onSessionEdited?: (date: string) => void;
 }) {
-  const { records: personalRecords, requestSessionEdit } = useCalendar();
+  const { records: personalRecords, requestSessionEdit, requestSessionDelete } = useCalendar();
   const [expanded, setExpanded] = useState(false);
   const rowId = useId();
   const perDay = dates.map(date => activitiesForDate(records, date)[kind]);
@@ -23,7 +23,7 @@ export default function CalendarDateRows({ dates, records, kind, onSessionEdited
         return <div key={date} aria-label={date}>{items.length ? (expanded ? items : items.slice(0, 1)).map(item => <div className={`date-row-card ${'status' in item && item.status === 'completed' ? 'is-completed' : ''}`} key={item.id}
           style={{ '--category-color': categoryColor(item, records) } as CSSProperties}>
           <span>{'status' in item && item.status === 'completed' && <><span className="completion-mark" aria-hidden="true">✓ </span><span className="sr-only">Completed: </span></>}{item.title}</span>
-          {kind === 'untimed' && personalRecords.sessions.some(session => session.id === item.id) && <button type="button" className="untimed-edit" aria-label={`Edit session: ${item.title} on ${date}`} onClick={() => requestSessionEdit(item.id, onSessionEdited)}>Edit</button>}
+          {kind === 'untimed' && personalRecords.sessions.some(session => session.id === item.id) && <div className="untimed-actions"><button type="button" className="untimed-edit" aria-label={`Edit session: ${item.title} on ${date}`} onClick={() => requestSessionEdit(item.id, onSessionEdited)}>Edit</button><button type="button" className="untimed-edit danger-text" aria-label={`Delete session: ${item.title} on ${date}`} onClick={() => requestSessionDelete(item.id)}>Delete</button></div>}
         </div>) : <span className="sr-only">No {label.toLowerCase()} items</span>}
         {!expanded && items.length > 1 && <button className="row-more" aria-controls={rowId} aria-expanded={expanded} onClick={() => setExpanded(true)}>+{items.length - 1} more<span className="sr-only"> on {date}</span></button>}</div>;
       })}

@@ -4,8 +4,8 @@ import type { ThemeStorage } from './theme.ts';
 import { addCalendarDays, getDayWindow, getSessionPosition, localMidnight } from './calendarDate.ts';
 import { initialSchedulingPreferences, isAllowedBedtime, workCutoffTime } from './schedulingPreferences.ts';
 import { localTimeChoices } from './manualScheduler.ts';
-
-export const SCHEDULE_STORAGE_KEY = 'personal-hub.schedule.v1';
+import { SCHEDULE_STORAGE_KEY } from './backupStorage.ts';
+export { SCHEDULE_STORAGE_KEY } from './backupStorage.ts';
 
 export function isClock(value: unknown): value is string {
   return typeof value === 'string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value);
