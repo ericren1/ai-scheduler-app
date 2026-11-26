@@ -12,7 +12,7 @@ import './components/scheduler/scheduler.css';
 
 export default function App() {
   return (
-    <ThemeProvider><SchedulingPreferencesProvider><BrowserRouter><CalendarProvider>
+    <ThemeProvider><SchedulingPreferencesProvider><BrowserRouter basename={import.meta.env.BASE_URL}><CalendarProvider>
       <Routes>
         <Route element={<AppLayout />}>
           <Route index element={<PlannerPage />} />
